@@ -11,6 +11,7 @@ export function isJsonReady() {
     return fs.existsSync(filePath)
 }
 
+// Create the JSON setup
 export function setup(data: { name: string; year: number }) {
     fs.writeFileSync('src/server/data/data.json', JSON.stringify(data))
 }
