@@ -2,7 +2,7 @@ import { Input } from '@/frontend/components/ui/input.tsx'
 import { Button } from '@/frontend/components/ui/button.tsx'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import axios from 'axios'
+import { api } from '@/frontend/components/lib/api-path.ts'
 
 interface Data {
     year: number | null
@@ -10,7 +10,9 @@ interface Data {
 }
 
 export default function Signup() {
+    // Storage the apprenticeship year (1, 2, 3)
     const [apprenticeShipYear, setApprenticeShipYear] = useState<number | null>(null)
+    // Name of user
     const [name, setName] = useState<string>('')
     const navigate = useNavigate()
 
@@ -20,11 +22,12 @@ export default function Signup() {
             year: apprenticeShipYear,
             name: name,
         }
-        const response = await axios.post('http://localhost:3000/api/createSetup', data)
+        const response = await api.post('/api/createSetup', data)
+        // If the data is created successfully navigate to the dashboard
         if (response.status === 200) {
             navigate('/dashboard')
         } else {
-            console.error('Something went wrong')
+            console.error('Please try again')
         }
     }
 

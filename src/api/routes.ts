@@ -1,13 +1,9 @@
 import express from 'express'
 import cors from 'cors'
-import { isJsonReady, setup } from '../server/storage-data.ts'
+import { getData, isJsonReady, setup } from '../server/storage-data.ts'
 
 const app = express()
-
-interface Data {
-    year: number
-    name: string
-}
+const port = 3000
 
 // Convert the data to json
 app.use(express.json())
@@ -18,8 +14,7 @@ app.use(cors())
 /* POST request to localhost:3000/api with the frontend data
  * we want to write in the backend **/
 app.post('/api/createSetup', (req, res) => {
-    const body = req.body as Data
-    setup(body)
+    setup(req.body)
     res.send({ message: 'Successfully sended' })
 })
 
@@ -29,7 +24,13 @@ app.get('/api/ready', (req, res) => {
     res.send(ready)
 })
 
+// Get the data from the backend
+app.get('/api/getData', (req, res) => {
+    const data = getData()
+    res.send(data)
+})
+
 // The active listen backend port
-app.listen(3000, () => {
-    console.log('Server is now running')
+app.listen(port, () => {
+    console.log('Server is now running on port: ' + port)
 })
