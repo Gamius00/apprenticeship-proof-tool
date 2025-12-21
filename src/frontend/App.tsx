@@ -13,7 +13,7 @@ export default function App() {
                 navigate('/signup')
             }
         })
-    })
+    }, [])
 
     return <></>
 }
