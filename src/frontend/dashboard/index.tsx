@@ -19,9 +19,12 @@ interface WeekObject {
 }
 
 export default function Dashboard() {
+    // Gets the metadata (e.g. Name)
     const [data, setData] = useState<Data | null>(null)
-    const [diffCount, setDiffCount] = useState(0)
+    // the offset between the current week and the week shown in the application
+    const [offset, setOffset] = useState(0)
     const navigate = useNavigate()
+    // The data for the first and last day of the current week
     const [weekObject, setWeekObject] = useState<WeekObject | null>(null)
 
     useEffect(() => {
@@ -34,7 +37,7 @@ export default function Dashboard() {
     }, [])
 
     return (
-        <div className="bg-background h-screen flex flex-col gap-40 text-text pt-3">
+        <div className="bg-background w-screen h-screen flex flex-col gap-40 text-text pt-3">
             <div className="flex justify-around">
                 <div className="flex gap-10">
                     <div className="flex flex-col items-center">
@@ -63,24 +66,28 @@ export default function Dashboard() {
             <div className="flex justify-around">
                 <MdOutlineArrowDropDownCircle
                     onClick={() => {
-                        setDiffCount(diffCount - 7)
+                        setOffset(offset - 7)
                     }}
                     className="rotate-90 mr-24 h-8 w-8"
                 />
                 <div className="flex-col items-center flex">
                     <p className="font-medium">Communardo Software</p>
                     <p className="text-lg mt-1 font-medium">
-                        {weekObject?.startDate.getDate()} -{weekObject?.endDate.getDate()}
+                        {weekObject &&
+                            `${weekObject.startDate.getDate()}.${weekObject.startDate.getMonth() + 1}.${weekObject.startDate.getFullYear()}`}{' '}
+                        -{' '}
+                        {weekObject &&
+                            `${weekObject.endDate.getDate()}.${weekObject.endDate.getMonth() + 1}.${weekObject.endDate.getFullYear()}`}
                     </p>
                 </div>
                 <MdOutlineArrowDropDownCircle
                     onClick={() => {
-                        setDiffCount(diffCount + 7)
+                        setOffset(offset + 7)
                     }}
                     className="ml-24 -rotate-90 h-8 w-8"
                 />
             </div>
-            <WeekView difference={diffCount} setWeekObject={setWeekObject} />
+            <WeekView difference={offset} setWeekObject={setWeekObject} />
         </div>
     )
 }

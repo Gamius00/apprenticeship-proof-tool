@@ -8,18 +8,19 @@ interface WeekViewProps {
 }
 
 export const WeekView = ({ difference, setWeekObject }: WeekViewProps) => {
+    // Gets an object with the days of the current week
     const week = getWeek(difference)
 
     useEffect(() => {
         const result = getWeek(difference)
+
+        // Sets the Week Object to the first and last day of the week
         setWeekObject({ startDate: result[0], endDate: result[result.length - 1] })
     }, [difference, setWeekObject])
 
-    console.log(week)
-
     return (
         <>
-            <div className="flex">
+            <div className="flex h-screen justify-around w-screen">
                 {week.map((day, index) => {
                     return (
                         <div key={index}>
