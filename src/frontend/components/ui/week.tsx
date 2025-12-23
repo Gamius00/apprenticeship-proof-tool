@@ -1,5 +1,5 @@
 import { Day } from '@/frontend/components/ui/day.tsx'
-import { getWeek } from '@/frontend/components/date.ts'
+import { getWeek } from '@/shared-utils/date.ts'
 import { useEffect } from 'react'
 
 interface WeekViewProps {
@@ -20,7 +20,7 @@ export const WeekView = ({ difference, setWeekObject }: WeekViewProps) => {
 
     return (
         <>
-            <div className="flex h-screen justify-around w-screen">
+            <div className="flex h-screen gap-4 justify-around w-screen overflow-hidden">
                 {week.map((day, index) => {
                     return (
                         <div key={index}>

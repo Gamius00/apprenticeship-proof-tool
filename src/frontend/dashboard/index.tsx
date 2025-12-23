@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
-import { BsViewList } from 'react-icons/bs'
 import { BiExport } from 'react-icons/bi'
 import { FaRegEdit } from 'react-icons/fa'
-import { FiPlusCircle } from 'react-icons/fi'
 import { api } from '@/frontend/components/lib/api-path.ts'
 import { MdOutlineArrowDropDownCircle } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
@@ -19,9 +17,9 @@ interface WeekObject {
 }
 
 export default function Dashboard() {
-    // Gets the metadata (e.g. Name)
+    /* Gets the metadata (e.g. Name) **/
     const [data, setData] = useState<Data | null>(null)
-    // the offset between the current week and the week shown in the application
+    /* the offset between the current week and the week shown in the application **/
     const [offset, setOffset] = useState(0)
     const navigate = useNavigate()
     // The data for the first and last day of the current week
@@ -33,17 +31,13 @@ export default function Dashboard() {
             if (!r.data) navigate('/signup')
         })
 
-        api.get('/api/getData').then(r => setData(r.data))
+        api.get('/api/getMetaData').then(r => setData(r.data))
     }, [])
 
     return (
         <div className="bg-background w-screen h-screen flex flex-col gap-40 text-text pt-3">
             <div className="flex justify-around">
                 <div className="flex gap-10">
-                    <div className="flex flex-col items-center">
-                        <BsViewList className="h-6 w-6" />
-                        <p className="text-xs">View</p>
-                    </div>
                     <div className="flex flex-col items-center">
                         <BiExport className="h-6 w-6" />
                         <p className="text-xs">Export</p>
@@ -56,10 +50,6 @@ export default function Dashboard() {
                     <div className="flex flex-col items-center">
                         <FaRegEdit className="h-6 w-6" />
                         <p className="text-xs">Edit Week</p>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <FiPlusCircle className="h-6 w-6" />
-                        <p className="text-xs">New Entry</p>
                     </div>
                 </div>
             </div>

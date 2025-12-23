@@ -3,15 +3,18 @@ import { Button } from '@/frontend/components/ui/shadcn/button.tsx'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { api } from '@/frontend/components/lib/api-path.ts'
+import { DateInput } from '@/frontend/components/ui/date-picker.tsx'
+import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
 
 interface Data {
-    year: number | null
+    apprenticeShipBegin: string | undefined
     name: string
 }
 
 export default function Signup() {
-    // Storage the apprenticeship year (1, 2, 3)
-    const [apprenticeShipYear, setApprenticeShipYear] = useState<number | null>(null)
+    const [apprenticeShipBegin, setApprenticeShipBegin] = useState<string | undefined>(
+        undefined,
+    )
     // Name of user
     const [name, setName] = useState<string>('')
     const navigate = useNavigate()
@@ -19,7 +22,10 @@ export default function Signup() {
     /* Api call to storage the data in the JSON File **/
     const handleFirstLogin = async () => {
         const data: Data = {
-            year: apprenticeShipYear,
+            apprenticeShipBegin: formatDate({
+                date: apprenticeShipBegin ? new Date(apprenticeShipBegin) : undefined,
+                formatDateOption: DATE_FORMATS.DAY_MONTH_YEAR,
+            }),
             name: name,
         }
         const response = await api.post('/api/createSetup', data)
@@ -29,10 +35,6 @@ export default function Signup() {
         } else {
             console.error('Please try again')
         }
-    }
-
-    const handleChangeApprenticeShipYear = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setApprenticeShipYear(Number(e.target.value))
     }
 
     const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,17 +61,12 @@ export default function Signup() {
                 </div>
 
                 <div className="mt-5">
-                    <p className="pb-2">Apprenticeship year (1, 2, 3)</p>
-                    <Input
-                        value={apprenticeShipYear || ''}
-                        type="number"
-                        min={1}
-                        max={3}
-                        onChange={e => {
-                            handleChangeApprenticeShipYear(e)
-                        }}
-                        className="w-96 bg-text text-black"
-                    />
+                    <div className="w-96">
+                        <DateInput
+                            setValue={setApprenticeShipBegin}
+                            value={apprenticeShipBegin}
+                        />
+                    </div>
                 </div>
 
                 <Button className="mt-10" onClick={handleFirstLogin}>

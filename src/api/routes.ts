@@ -1,6 +1,11 @@
 import express from 'express'
 import cors from 'cors'
-import { getData, isJsonReady, setup } from '../server/storage-data.ts'
+import {
+    getMetaData,
+    isJsonReady,
+    setup,
+    storesNewEntry,
+} from '../server/storage-data.ts'
 
 const app = express()
 const port = 3000
@@ -25,8 +30,14 @@ app.get('/api/ready', (req, res) => {
 })
 
 // Get the data from the backend
-app.get('/api/getData', (req, res) => {
-    const data = getData()
+app.get('/api/getMetaData', (req, res) => {
+    const data = getMetaData()
+    res.send(data)
+})
+
+app.post('/api/storeNewEntry', (req, res) => {
+    const data = storesNewEntry(req.body)
+    console.log(data)
     res.send(data)
 })
 
