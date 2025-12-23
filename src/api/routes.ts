@@ -6,9 +6,9 @@ import {
     setup,
     storesNewEntry,
 } from '../server/storage-data.ts'
+import { port } from '../shared-utils/api-path.ts'
 
 const app = express()
-const port = 3000
 
 // Convert the data to json
 app.use(express.json())

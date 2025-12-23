@@ -2,7 +2,7 @@ import { Input } from '@/frontend/components/ui/shadcn/input.tsx'
 import { Button } from '@/frontend/components/ui/shadcn/button.tsx'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { api } from '@/frontend/components/lib/api-path.ts'
+import { api } from '@/shared-utils/api-path.ts'
 import { DateInput } from '@/frontend/components/ui/date-picker.tsx'
 import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
 

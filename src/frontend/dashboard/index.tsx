@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BiExport } from 'react-icons/bi'
 import { FaRegEdit } from 'react-icons/fa'
-import { api } from '@/frontend/components/lib/api-path.ts'
+import { api } from '@/shared-utils/api-path.ts'
 import { MdOutlineArrowDropDownCircle } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
 import { WeekView } from '@/frontend/components/ui/week.tsx'

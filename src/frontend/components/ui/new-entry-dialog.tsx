@@ -7,7 +7,7 @@ import {
 } from '@/frontend/components/ui/shadcn/dialog.tsx'
 import { Input } from '@/frontend/components/ui/shadcn/input.tsx'
 import { Button } from '@/frontend/components/ui/shadcn/button.tsx'
-import { api } from '@/frontend/components/lib/api-path.ts'
+import { api } from '@/shared-utils/api-path.ts'
 import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
 import React, { useState } from 'react'
 
