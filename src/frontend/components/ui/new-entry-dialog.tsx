@@ -4,12 +4,12 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from '@/frontend/components/ui/shadcn/dialog.tsx'
-import { Input } from '@/frontend/components/ui/shadcn/input.tsx'
-import { Button } from '@/frontend/components/ui/shadcn/button.tsx'
-import { api } from '@/shared-utils/api-path.ts'
-import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
-import React, { useState } from 'react'
+} from "@/frontend/components/ui/shadcn/dialog.tsx"
+import { Input } from "@/frontend/components/ui/shadcn/input.tsx"
+import { Button } from "@/frontend/components/ui/shadcn/button.tsx"
+import { api } from "@/shared-utils/api-path.ts"
+import { DATE_FORMATS, formatDate } from "@/shared-utils/date.ts"
+import React, { useState } from "react"
 
 interface NewEntryDialogProps {
     isOpen: boolean
@@ -28,13 +28,11 @@ export const NewEntryDialog = ({
     setIsOpen,
     currentDay,
 }: NewEntryDialogProps) => {
-    const [activityValue, setActivityValue] = useState('')
+    const [activityValue, setActivityValue] = useState("")
 
     const handleFormSubmit = () => {
         setIsOpen(false)
-        api.post('api/storeNewEntry', { day: currentDay, value: activityValue }).then(r =>
-            console.log(r),
-        )
+        api.post("api/storeNewWeekData", { day: currentDay, value: activityValue })
     }
 
     const onActivityValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +49,7 @@ export const NewEntryDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        New Entry for{' '}
+                        New Entry for{" "}
                         {formatDate({
                             date: currentDay,
                             formatDateOption: DATE_FORMATS.LONG_WEEKDAY,

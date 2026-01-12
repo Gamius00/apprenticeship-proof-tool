@@ -1,8 +1,9 @@
-const DEFAULT_LOCALE = 'en-US'
+const DEFAULT_LOCALE = "en-US"
 
 interface FormatDateProps {
     date: Date | undefined
     region?: string
+    toISOLocale?: boolean
     formatDateOption?: Intl.DateTimeFormatOptions
 }
 
@@ -14,15 +15,15 @@ const DATE_FORMATS: {
     LONG_WEEKDAY: Intl.DateTimeFormatOptions
 } = {
     // For example: Tue., 11. December
-    DAY_MONTH_NAME_YEAR: { day: 'numeric', month: 'long', year: 'numeric' },
+    DAY_MONTH_NAME_YEAR: { day: "numeric", month: "long", year: "numeric" },
     // For example: 5. December 2025
-    DAY_MONTH_NAME_WEEKDAY: { day: 'numeric', month: 'long', weekday: 'short' },
-    // For example: 5. December 2025
-    DAY_MONTH_YEAR: { day: 'numeric', month: 'numeric', year: 'numeric' },
+    DAY_MONTH_NAME_WEEKDAY: { day: "numeric", month: "long", weekday: "short" },
+    // For example: 5.12.2025
+    DAY_MONTH_YEAR: { day: "numeric", month: "numeric", year: "numeric" },
     // For example: 5. December
-    DAY_MONTH_NAME: { day: 'numeric', month: 'long' },
+    DAY_MONTH_NAME: { day: "numeric", month: "long" },
     // For example: Monday
-    LONG_WEEKDAY: { weekday: 'long' },
+    LONG_WEEKDAY: { weekday: "long" },
 }
 export { DATE_FORMATS }
 
@@ -61,19 +62,25 @@ export const getWeek = (difference: number) => {
     return array
 }
 
-/**
+/** This function formats the given date object into another format (e.g. DATE_FORMATS)
  * @param formatDateOption - The Option to format the Date String
  * @param date - The Date to format
  * @param region - The format language and region
+ * @param toISOLocale - To format date strings to a local ISO string for parsing the json data correctly
  */
 
 export const formatDate = ({
     date,
     region = DEFAULT_LOCALE,
+    toISOLocale = false,
     formatDateOption,
 }: FormatDateProps) => {
     if (!date) {
         return
+    }
+
+    if (toISOLocale) {
+        return new Intl.DateTimeFormat("sv-SE").format(new Date(date))
     }
 
     /* Creates a standard locale object for the given region*/

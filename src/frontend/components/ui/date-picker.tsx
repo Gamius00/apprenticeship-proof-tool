@@ -1,18 +1,18 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import { CalendarIcon } from 'lucide-react'
+import * as React from "react"
+import { CalendarIcon } from "lucide-react"
 
-import { Button } from '@/frontend/components/ui/shadcn/button'
-import { Calendar } from '@/frontend/components/ui/shadcn/calendar'
-import { Input } from '@/frontend/components/ui/shadcn/input'
-import { Label } from '@/frontend/components/ui/shadcn/label'
+import { Button } from "@/frontend/components/ui/shadcn/button"
+import { Calendar } from "@/frontend/components/ui/shadcn/calendar"
+import { Input } from "@/frontend/components/ui/shadcn/input"
+import { Label } from "@/frontend/components/ui/shadcn/label"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/frontend/components/ui/shadcn/popover'
-import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
+} from "@/frontend/components/ui/shadcn/popover"
+import { DATE_FORMATS, formatDate } from "@/shared-utils/date.ts"
 
 function isValidDate(date: Date | undefined) {
     if (!date) {
@@ -28,19 +28,16 @@ interface DatePickerProps {
 
 export function DateInput({ value, setValue }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
-    const [date, setDate] = React.useState<Date | undefined>(new Date('2025-06-01'))
+    const [date, setDate] = React.useState<Date | undefined>(new Date("2025-06-01"))
     const [month, setMonth] = React.useState<Date | undefined>(date)
 
     return (
         <div className="flex flex-col gap-3">
-            <Label htmlFor="date" className="px-1">
-                Apprenticeship begin Date
-            </Label>
             <div className="relative flex gap-2">
                 <Input
                     id="date"
                     value={value}
-                    placeholder={'11. Juni 2025'}
+                    placeholder={"11. Juni 2025"}
                     className="bg-text text-black pr-10"
                     onChange={e => {
                         const date = new Date(e.target.value)
@@ -51,7 +48,7 @@ export function DateInput({ value, setValue }: DatePickerProps) {
                         }
                     }}
                     onKeyDown={e => {
-                        if (e.key === 'ArrowDown') {
+                        if (e.key === "ArrowDown") {
                             e.preventDefault()
                             setOpen(true)
                         }

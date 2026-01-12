@@ -1,10 +1,10 @@
-import { Input } from '@/frontend/components/ui/shadcn/input.tsx'
-import { Button } from '@/frontend/components/ui/shadcn/button.tsx'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { api } from '@/shared-utils/api-path.ts'
-import { DateInput } from '@/frontend/components/ui/date-picker.tsx'
-import { DATE_FORMATS, formatDate } from '@/shared-utils/date.ts'
+import { Input } from "@/frontend/components/ui/shadcn/input.tsx"
+import { Button } from "@/frontend/components/ui/shadcn/button.tsx"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { api } from "@/shared-utils/api-path.ts"
+import { DateInput } from "@/frontend/components/ui/date-picker.tsx"
+import { DATE_FORMATS, formatDate } from "@/shared-utils/date.ts"
 
 interface Data {
     apprenticeShipBegin: string | undefined
@@ -16,7 +16,7 @@ export default function Signup() {
         undefined,
     )
     // Name of user
-    const [name, setName] = useState<string>('')
+    const [name, setName] = useState<string>("")
     const navigate = useNavigate()
 
     /* Api call to storage the data in the JSON File **/
@@ -28,12 +28,12 @@ export default function Signup() {
             }),
             name: name,
         }
-        const response = await api.post('/api/createSetup', data)
+        const response = await api.post("/api/createSetup", data)
         // If the data is created successfully navigate to the dashboard
         if (response.status === 200) {
-            navigate('/dashboard')
+            navigate("/dashboard")
         } else {
-            console.error('Please try again')
+            console.error("Please try again")
         }
     }
 
@@ -62,6 +62,7 @@ export default function Signup() {
 
                 <div className="mt-5">
                     <div className="w-96">
+                        <p className="pb-2">Apprenticeship begin date</p>
                         <DateInput
                             setValue={setApprenticeShipBegin}
                             value={apprenticeShipBegin}
