@@ -1,3 +1,5 @@
+"use client"
+
 import {
     Dialog,
     DialogContent,
@@ -18,41 +20,76 @@ import {
 import { Checkbox } from "@/frontend/components/ui/shadcn/checkbox.tsx"
 import { DateInput } from "@/frontend/components/ui/date-picker.tsx"
 import { api } from "@/shared-utils/api-path.ts"
+import type { DataProps, WeekObject } from "@/shared-utils/types.ts"
+import { Input } from "@/frontend/components/ui/shadcn/input.tsx"
+import { formatDate } from "@/shared-utils/date.ts"
 
 interface NewEntryDialogProps {
     isOpen: boolean
     setIsOpen: (arg: boolean) => void
-    currentWeek: Date[]
-    trainingLocation: string | null
+    weekObject: WeekObject | null
 }
 
 /**
  * @param isOpen - Manage the state of the dialog (close, open)
  * @param setIsOpen - To change the state of the variable
- * @param currentWeek - An array with the days of the current week
- * @param trainingLocation - The learning location from the user (e.g. school, company)
+ * @param weekObject
  */
 
 export const EditWeekDialog = ({
     isOpen,
     setIsOpen,
-    currentWeek,
-    trainingLocation,
+    weekObject,
 }: NewEntryDialogProps) => {
+    /** This value contains the current state of the trainingLocation input */
     const [activityValue, setActivityValue] = useState<string | null>(null)
+    /** This is the state of the checkBox if it is checked or not */
     const [isChecked, setIsChecked] = useState(false)
-    const [absenceBeginDate, setAbsenceBeginDate] = useState<string | undefined>("")
-    const [absenceEndDate, setAbsenceEndDate] = useState<string | undefined>("")
+    /** The state of the Datepicker input for the absence begin */
+    const [absenceBeginDate, setAbsenceBeginDate] = useState<string | undefined>(
+        undefined,
+    )
+    /** The state of the Datepicker input for the absence end */
+    const [absenceEndDate, setAbsenceEndDate] = useState<string | undefined>(undefined)
+    /** The Reason for the absence (e.g. Sickness, Vacation) */
+    const [absenceReason, setAbsenceReason] = useState<string | undefined>(undefined)
 
+    /** This function handles the updated data after pressing the save button */
     const handleUpdateWeek = () => {
-        const data = {
-            day: currentWeek[0],
+        /** This checks if all inputs are not empty */
+        if ((!absenceReason || !absenceBeginDate || !absenceEndDate) && isChecked) return
+
+        if (!weekObject?.startDate) return
+
+        const data: DataProps = {
+            day: weekObject?.startDate,
             trainingLocation: activityValue,
+            /** If the checkbox is checked and the inputs are not empty send the data */
+            ...(isChecked && {
+                absence: {
+                    start: formatDate({
+                        date: new Date(absenceBeginDate ?? ""),
+                        toISOLocale: true,
+                    }),
+                    end: formatDate({
+                        date: new Date(absenceEndDate ?? ""),
+                        toISOLocale: true,
+                    }),
+                    reason: absenceReason ?? "",
+                },
+            }),
         }
 
-        api.post("api/storeNewWeekData", data)
-
+        /** Closes the dialog */
         setIsOpen(false)
+
+        /** Stores a new entry with the data */
+        api.post("api/storeNewWeekData", data)
+    }
+
+    /** The change event for the absence reason input */
+    const handleReasonChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setAbsenceReason(event.target.value)
     }
 
     return (
@@ -74,7 +111,7 @@ export const EditWeekDialog = ({
                                 <SelectValue
                                     placeholder={
                                         activityValue ??
-                                        trainingLocation ??
+                                        weekObject?.trainingLocation ??
                                         "Communardo Software"
                                     }
                                 />
@@ -126,6 +163,17 @@ export const EditWeekDialog = ({
                                 <DateInput
                                     value={absenceEndDate}
                                     setValue={setAbsenceEndDate}
+                                />
+                            </div>
+
+                            <div>
+                                <p className="my-1">Reason</p>
+                                <Input
+                                    className="text-black bg-text"
+                                    value={absenceReason}
+                                    onChange={event => {
+                                        handleReasonChange(event)
+                                    }}
                                 />
                             </div>
                         </div>

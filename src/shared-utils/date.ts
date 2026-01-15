@@ -76,6 +76,7 @@ export const formatDate = ({
     formatDateOption,
 }: FormatDateProps) => {
     if (!date) {
+        console.error("The input is not a valid date")
         return
     }
 

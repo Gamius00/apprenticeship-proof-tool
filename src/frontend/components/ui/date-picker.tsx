@@ -6,7 +6,6 @@ import { CalendarIcon } from "lucide-react"
 import { Button } from "@/frontend/components/ui/shadcn/button"
 import { Calendar } from "@/frontend/components/ui/shadcn/calendar"
 import { Input } from "@/frontend/components/ui/shadcn/input"
-import { Label } from "@/frontend/components/ui/shadcn/label"
 import {
     Popover,
     PopoverContent,

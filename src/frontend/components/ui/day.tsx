@@ -5,14 +5,11 @@ import { DATE_FORMATS, formatDate } from "@/shared-utils/date.ts"
 import { api } from "@/shared-utils/api-path.ts"
 import { IoMdClose } from "react-icons/io"
 import { cn } from "@/frontend/components/lib/utils.ts"
-
-interface getEntryData {
-    date: string | undefined
-    entries: string[] | undefined
-}
+import { DayTypes } from "@/shared-utils/types"
 
 export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
-    const [data, setData] = useState<getEntryData | undefined>()
+    /** The data for the selected day */
+    const [data, setData] = useState<DayTypes | undefined>()
 
     const currentDay: Date = new Date(day)
 
@@ -26,16 +23,33 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
     const [isNewEntryDialogOpen, setIsNewEntryDialogOpen] = useState(false)
 
     useEffect(() => {
+        if (!isHoliday) return
+
+        const data = {
+            day: day,
+            isHoliday: isHoliday,
+        }
+
+        api.post("api/storeNewWeekData", data)
+    }, [day, isHoliday])
+
+    useEffect(() => {
         if (isNewEntryDialogOpen) return
 
         api.post("/api/getEntry", { date: day }).then(r => setData(r.data))
     }, [day, isNewEntryDialogOpen])
 
+    if (!data) return
+
+    /** This function calls the backend deleteEntry function to delete an entry with the correct index
+     * @param index - The index of the entry which the user wants to delete */
+
     const removeEntry = (index: number) => {
+        /** The optimistic updates for the user that the entry removes directly after clicking the button */
         data!.entries!.splice(index, 1)
 
         setData({
-            date: formatDate({ date: day, toISOLocale: true }),
+            date: formatDate({ date: day, toISOLocale: true }) ?? "",
             entries: data?.entries,
         })
         api.post("/api/deleteEntry", { index, day })
@@ -45,20 +59,20 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
         <div
             className={cn(
                 "p-1 z-50 rounded-t-2xl pt-5 h-full w-72 bg-primary",
-                isHoliday && "bg-secondary",
+                (isHoliday || data.absence) && "bg-secondary",
             )}
         >
             <div className="flex w-full justify-around items-center">
                 <div
                     className={cn(
                         "flex flex-col ml-20 items-center",
-                        isHoliday && "ml-0",
+                        (isHoliday || data.absence) && "ml-0",
                     )}
                 >
                     <p className="font-medium">{weekday}</p>
                     <p>{formatDate({ date: currentDay, region: "de-DE" })}</p>
                 </div>
-                {!isHoliday && (
+                {!(isHoliday || data.absence) && (
                     <FiPlusCircle
                         onClick={() => {
                             setIsNewEntryDialogOpen(true)
@@ -73,10 +87,17 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
                 setIsOpen={setIsNewEntryDialogOpen}
             />
 
-            {/** Displays if the day is a holiday*/}
+            {/** Displays "Feiertag" if the day is a holiday*/}
             {isHoliday && (
                 <div className="bold flex justify-center mt-20 text-xl">
                     <p>Feiertag</p>
+                </div>
+            )}
+
+            {/** Displays the reason for the absence if the day is a holiday*/}
+            {data.absence && (
+                <div className="bold flex justify-center mt-20 text-xl">
+                    <p>{data.absence}</p>
                 </div>
             )}
 

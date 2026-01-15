@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 import { formatDate, getMonday, getWeek } from "../shared-utils/date.ts"
-import type { InsertDataReturn } from "../shared-utils/types.ts"
+import type { DataProps, DayTypes, InsertDataReturn } from "../shared-utils/types.ts"
 
 const metaDataPath = path.join("src/server/data/")
 const weekDataPath = path.join("src/server/data/weeks/")
@@ -10,6 +10,9 @@ interface insertDataProps {
     date: Date
     trainingLocation?: string
 }
+
+/** Creates a valid date and gets the timestamp */
+const toTime = (date: string | Date) => new Date(date).getTime()
 
 /** This function calculates the data you have to store for every week
  * @param date - The selected day of the current week
@@ -30,9 +33,8 @@ const insertData = ({ date, trainingLocation }: insertDataProps): InsertDataRetu
         trainingLocation: trainingLocation ?? "Communardo Software",
         days: weekData.map(date => {
             return {
-                date: formatDate({ date: date, toISOLocale: true }),
+                date: formatDate({ date: date, toISOLocale: true }) ?? "",
                 entries: [],
-                absence: "",
             }
         }),
     }
@@ -61,10 +63,10 @@ export const calculateWeeksSinceBegin = (day: Date) => {
     const dayBegin: { apprenticeShipBegin: string; name: string } = getMetaData()
 
     /* This stores the calculated time in milliseconds of the beginning day */
-    const beginTime = new Date(getMonday(dayBegin.apprenticeShipBegin)).getTime()
+    const beginTime = toTime(getMonday(dayBegin.apprenticeShipBegin))
 
     /* This stores the calculated time in milliseconds of the current day */
-    const currentDay = new Date(getMonday(day.toString())).getTime()
+    const currentDay = toTime(getMonday(day.toString()))
 
     /* The result calculates the time since the apprenticeship starts in milliseconds and divide
      * it by the number of days in a week in milliseconds. Then we increase the result by 1, because
@@ -102,14 +104,16 @@ const upsertWeek = (proofNumber: number, data?: InsertDataReturn) => {
     fs.writeFileSync(weekDataPath + `week-${proofNumber}.json`, JSON.stringify(data))
 }
 
-export function storesNewWeekData(data: {
-    day: Date
-    value?: string
-    trainingLocation?: string
-}) {
+/** This func creates a new entry for a selected day
+ * @param data.day - The day you want to store an entry for
+ * @param data.value - The text you want to store
+ * @param data.trainingsLocation - The trainingsLocation for the selected week */
+
+export function storesNewWeekData(data: DataProps) {
     const proofNumber = calculateWeeksSinceBegin(data.day)
     const weekExists = doesWeekExist(proofNumber)
 
+    /** Checks if already an entry is stored for this week, if not create one */
     if (!weekExists) {
         upsertWeek(proofNumber, insertData({ date: data.day }))
     }
@@ -117,26 +121,60 @@ export function storesNewWeekData(data: {
     /** Stores the data of the displayed week */
     const weekData = getWeekData(proofNumber)
 
+    /** The day to insert the data which the user wants to storage */
+    const dayToInsert = formatDate({ date: data.day, toISOLocale: true })
+    /** Searches for the date in the array that matches the selected date. */
+    const newWeekData = weekData.days.find(
+        (entry: DayTypes) => entry.date === dayToInsert,
+    )
+
+    /** If the updated data object contains the trainingLocation update this too */
     if (data.trainingLocation) {
         weekData.trainingLocation = data.trainingLocation
     }
 
-    if (data.value) {
-        /** The day to insert the data which the user wants to storage */
-        const dayToInsert = formatDate({ date: data.day, toISOLocale: true })
-        /** Searches for the date in the array that matches the selected date. */
-        const newWeekData = weekData.days.find(
-            (entry: { date: string }) => entry.date === dayToInsert,
-        )
+    /** If the selected day is a holiday in saxony set isHoliday = true */
+    if (data.isHoliday) {
+        newWeekData.isHoliday = true
+    }
 
+    if (data.absence) {
+        /** Checks if start and end date is defined */
+        if (!data.absence.start || !data.absence.end) return
+
+        /** The timestamp for the absence end date */
+        const end = toTime(data.absence.end)
+
+        /** The timestamp for the absence start date */
+        const start = toTime(data.absence.start)
+
+        /** Checks each day to see if its timestamp falls within the start and end range */
+        weekData.days.map((entry: DayTypes) => {
+            const currentDay = toTime(entry.date)
+
+            console.log(start, entry.date, currentDay, end, data.absence?.end)
+
+            if (start <= currentDay && currentDay <= end) {
+                /** Sets the reason for the absence */
+                entry.absence = data.absence?.reason
+            }
+        })
+    }
+
+    if (data.value) {
         /** Add the new entry to the data */
         newWeekData.entries.push(data.value)
     }
 
+    console.log(weekData)
     upsertWeek(proofNumber, weekData)
 
     return true
 }
+
+/** This function deletes an entry for the day
+ * @param day - The day you want to delete an entry for
+ * @param index - The index in the entry list you want to delete */
 
 export const deleteEntry = ({ day, index }: { day: Date; index: number }) => {
     const proofNumber = calculateWeeksSinceBegin(day)
@@ -156,6 +194,7 @@ export const deleteEntry = ({ day, index }: { day: Date; index: number }) => {
             formatDate({ date: day, toISOLocale: true }),
     )
 
+    /** Deletes the entry with the correct index */
     element.entries.splice(index, 1)
 
     /** Update the data for the selected week */

@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { BiExport } from "react-icons/bi"
 import { FaRegEdit } from "react-icons/fa"
@@ -6,7 +8,6 @@ import { MdOutlineArrowDropDownCircle } from "react-icons/md"
 import { useNavigate } from "react-router-dom"
 import { WeekView } from "@/frontend/components/ui/week.tsx"
 import { EditWeekDialog } from "@/frontend/components/ui/edit-week-dialog.tsx"
-import { getWeek } from "@/shared-utils/date.ts"
 import { WeekObject } from "@/shared-utils/types.ts"
 
 interface Data {
@@ -24,7 +25,6 @@ export default function Dashboard() {
     const [weekObject, setWeekObject] = useState<WeekObject | null>(null)
     /** Manages the open close state of the edit week dialog */
     const [isEditWeekDialogOpen, setIsWeekDialogOpen] = useState<boolean>(false)
-    const [trainingLocation, setTrainingLocation] = useState<string | null>(null)
 
     useEffect(() => {
         // Ensures that the user stays on the correct page
@@ -35,6 +35,7 @@ export default function Dashboard() {
         api.get("/api/getMetaData").then(r => setData(r.data))
     }, [])
 
+    /** This useEffect gets the weekData for the selected week */
     useEffect(() => {
         if (!weekObject?.startDate) return
 
@@ -43,11 +44,22 @@ export default function Dashboard() {
         }
 
         api.post("api/getWeekData", payload).then(r => {
-            setTrainingLocation(r.data.trainingLocation)
-        })
-    }, [isEditWeekDialogOpen, weekObject])
+            /** Update the trainingLocation from the weekObject */
+            setWeekObject(prevState => {
+                /** Checks if already a state is storaged */
+                if (!prevState) return null
 
+                return {
+                    ...prevState,
+                    trainingLocation: r.data.trainingLocation,
+                }
+            })
+        })
+    }, [isEditWeekDialogOpen, offset, weekObject?.startDate])
+
+    /** This function creates a pdf with the data which the user storaged */
     const createPdf = async () => {
+        /** The week, which the pdf is for */
         const data = {
             weekStart: weekObject?.startDate,
             weekEnd: weekObject?.endDate,
@@ -56,9 +68,12 @@ export default function Dashboard() {
             responseType: "blob",
         })
 
+        /** Gets the data from the backend */
         const blob = await response.data
+        /** Converts the binary data to e.g. usable URL */
         const url = URL.createObjectURL(blob)
 
+        /** Opens the URL (PDF) in the Browser */
         window.open(url)
     }
 
@@ -89,6 +104,11 @@ export default function Dashboard() {
                         <FaRegEdit className="h-6 w-6" />
                         <p className="text-xs">Edit Week</p>
                     </div>
+                    <img
+                        src="communardo-logo.png"
+                        alt="Communardo Logo"
+                        className="h-8 w-14 lg:absolute right-8"
+                    />
                 </div>
             </div>
             <div className="flex justify-around">
@@ -100,7 +120,7 @@ export default function Dashboard() {
                 />
                 <div className="flex-col items-center flex">
                     <p className="font-medium">
-                        {trainingLocation ?? "Communardo Software"}
+                        {weekObject?.trainingLocation ?? "Communardo Software"}
                     </p>
                     <p className="text-lg mt-1 font-medium">
                         {weekObject &&
@@ -125,8 +145,7 @@ export default function Dashboard() {
             <EditWeekDialog
                 isOpen={isEditWeekDialogOpen}
                 setIsOpen={setIsWeekDialogOpen}
-                currentWeek={getWeek(offset)}
-                trainingLocation={trainingLocation}
+                weekObject={weekObject}
             />
         </div>
     )

@@ -1,13 +1,27 @@
-export interface Day {
-    date: string | undefined
+export interface DayTypes {
+    date: string
     entries: string[]
+    absence?: string
+    isHoliday?: boolean
+}
+
+export interface DataProps {
+    day: Date
+    trainingLocation: string | null
+    isHoliday?: boolean
+    value?: string
+    absence?: {
+        end: string | undefined
+        start: string | undefined
+        reason: string
+    }
 }
 
 export interface InsertDataReturn {
     weekStart: string | undefined
     weekEnd: string | undefined
     trainingLocation: string
-    days: Day[]
+    days: DayTypes[]
 }
 
 export interface Holiday {
@@ -23,6 +37,7 @@ export interface Holiday {
 export interface WeekObject {
     startDate: Date
     endDate: Date
+    trainingLocation?: string
 }
 
 export interface WeekViewProps {
