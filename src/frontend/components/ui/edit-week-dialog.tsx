@@ -20,7 +20,7 @@ import {
 import { Checkbox } from "@/frontend/components/ui/shadcn/checkbox.tsx"
 import { DateInput } from "@/frontend/components/ui/date-picker.tsx"
 import { api } from "@/shared-utils/api-path.ts"
-import type { DataProps, WeekObject } from "@/shared-utils/types.ts"
+import type { AbsenceProps, DataProps, WeekObject } from "@/shared-utils/types.ts"
 import { Input } from "@/frontend/components/ui/shadcn/input.tsx"
 import { formatDate } from "@/shared-utils/date.ts"
 
@@ -28,6 +28,7 @@ interface NewEntryDialogProps {
     isOpen: boolean
     setIsOpen: (arg: boolean) => void
     weekObject: WeekObject | null
+    setWeekObject: React.Dispatch<React.SetStateAction<WeekObject | null>>
 }
 
 /**
@@ -39,6 +40,7 @@ interface NewEntryDialogProps {
 export const EditWeekDialog = ({
     isOpen,
     setIsOpen,
+    setWeekObject,
     weekObject,
 }: NewEntryDialogProps) => {
     /** This value contains the current state of the trainingLocation input */
@@ -59,6 +61,25 @@ export const EditWeekDialog = ({
         /** This checks if all inputs are not empty */
         if ((!absenceReason || !absenceBeginDate || !absenceEndDate) && isChecked) return
 
+        const absence: AbsenceProps = {
+            start: formatDate({
+                date: new Date(absenceBeginDate ?? ""),
+                toISOLocale: true,
+            }),
+            end: formatDate({
+                date: new Date(absenceEndDate ?? ""),
+                toISOLocale: true,
+            }),
+            reason: absenceReason ?? "",
+        }
+
+        /** Optimistic Update for absence prop if the checkbox is checked*/
+        if (isChecked) {
+            setWeekObject((prev: WeekObject | null) =>
+                prev ? { ...prev, absence: absence } : prev,
+            )
+        }
+
         if (!weekObject?.startDate) return
 
         const data: DataProps = {
@@ -66,17 +87,7 @@ export const EditWeekDialog = ({
             trainingLocation: activityValue,
             /** If the checkbox is checked and the inputs are not empty send the data */
             ...(isChecked && {
-                absence: {
-                    start: formatDate({
-                        date: new Date(absenceBeginDate ?? ""),
-                        toISOLocale: true,
-                    }),
-                    end: formatDate({
-                        date: new Date(absenceEndDate ?? ""),
-                        toISOLocale: true,
-                    }),
-                    reason: absenceReason ?? "",
-                },
+                absence: absence,
             }),
         }
 

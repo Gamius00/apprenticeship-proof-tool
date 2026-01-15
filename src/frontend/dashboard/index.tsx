@@ -141,11 +141,13 @@ export default function Dashboard() {
                 difference={offset}
                 isOpen={isEditWeekDialogOpen}
                 setWeekObject={setWeekObject}
+                weekObject={weekObject}
             />
             <EditWeekDialog
                 isOpen={isEditWeekDialogOpen}
                 setIsOpen={setIsWeekDialogOpen}
                 weekObject={weekObject}
+                setWeekObject={setWeekObject}
             />
         </div>
     )

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import type { Holiday, WeekViewProps } from "@/shared-utils/types.ts"
 
-export const WeekView = ({ difference, setWeekObject }: WeekViewProps) => {
+export const WeekView = ({ difference, setWeekObject, weekObject }: WeekViewProps) => {
     /** Gets an object with the days of the current week
      * using useMemo to storage the rendered state and only update it
      * if the state changes, useMemo checks if previous state is changed */
@@ -54,6 +54,7 @@ export const WeekView = ({ difference, setWeekObject }: WeekViewProps) => {
                             <Day
                                 day={day}
                                 isHoliday={isHoliday !== undefined && isHoliday}
+                                weekObject={weekObject}
                             />
                         </div>
                     )

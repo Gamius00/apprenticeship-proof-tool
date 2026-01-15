@@ -97,6 +97,10 @@ export const createPdf = async (data: { weekStart: string; weekEnd: string }) =>
                 size: 12,
                 color: rgb(0, 0, 0),
             })
+
+            /** If there was already an entry, hide this entry by leaving this
+             * map function, so no entry can be rendered */
+            return
         }
 
         entry.entries.map(item => {

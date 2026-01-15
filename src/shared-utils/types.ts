@@ -10,11 +10,13 @@ export interface DataProps {
     trainingLocation: string | null
     isHoliday?: boolean
     value?: string
-    absence?: {
-        end: string | undefined
-        start: string | undefined
-        reason: string
-    }
+    absence?: AbsenceProps
+}
+
+export interface AbsenceProps {
+    end: string | undefined
+    start: string | undefined
+    reason: string
 }
 
 export interface InsertDataReturn {
@@ -38,10 +40,12 @@ export interface WeekObject {
     startDate: Date
     endDate: Date
     trainingLocation?: string
+    absence?: AbsenceProps
 }
 
 export interface WeekViewProps {
     difference: number
     isOpen: boolean
+    weekObject: WeekObject | null
     setWeekObject: (weekObj: WeekObject) => void
 }

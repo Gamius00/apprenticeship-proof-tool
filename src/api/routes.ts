@@ -8,6 +8,7 @@ import {
     setup,
     resolveWeekData,
     storesNewWeekData,
+    removeAbsence,
 } from "../server/storage-data.ts"
 import { port } from "../shared-utils/api-path.ts"
 import { createPdf } from "../server/createPdf.ts"
@@ -31,6 +32,10 @@ app.post("/api/createSetup", (req, res) => {
 app.get("/api/ready", (req, res) => {
     const ready = isJsonReady()
     res.send(ready)
+})
+
+app.post("/api/removeAbsence", req => {
+    removeAbsence(req.body)
 })
 
 // Get the data from the backend

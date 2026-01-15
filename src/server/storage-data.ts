@@ -14,6 +14,28 @@ interface insertDataProps {
 /** Creates a valid date and gets the timestamp */
 const toTime = (date: string | Date) => new Date(date).getTime()
 
+/** This function removes an absence from a day from the backend (e.g. Sick, Vacation)
+ * for example, the user created an absence for a wrong day*/
+export const removeAbsence = ({ day }: { day: Date }) => {
+    const proofNumber = calculateWeeksSinceBegin(day)
+    const weekData: InsertDataReturn = getWeekData(proofNumber)
+
+    /** Format the date in the correct format */
+    const formatedDay = formatDate({ date: day, toISOLocale: true })
+
+    /** Storages the returned matched object from the function */
+    const newWeekData = weekDayMatch(weekData, formatedDay)
+
+    /** Checks if we got a match */
+    if (!newWeekData) return
+
+    /** set absence to undefined */
+    newWeekData.absence = undefined
+
+    /** Update the new Data */
+    upsertWeek(proofNumber, weekData)
+}
+
 /** This function calculates the data you have to store for every week
  * @param date - The selected day of the current week
  * @param trainingLocation - The location of the week (e.g. School, Company)
@@ -104,6 +126,13 @@ const upsertWeek = (proofNumber: number, data?: InsertDataReturn) => {
     fs.writeFileSync(weekDataPath + `week-${proofNumber}.json`, JSON.stringify(data))
 }
 
+/** Checks which date matches the day the user want to update
+ * @param weekData - Contains the whole data for the selected week
+ * @param day - The day the user wants to update */
+const weekDayMatch = (weekData: InsertDataReturn, day: string | undefined) => {
+    return weekData.days.find((entry: DayTypes) => entry.date === day)
+}
+
 /** This func creates a new entry for a selected day
  * @param data.day - The day you want to store an entry for
  * @param data.value - The text you want to store
@@ -124,9 +153,9 @@ export function storesNewWeekData(data: DataProps) {
     /** The day to insert the data which the user wants to storage */
     const dayToInsert = formatDate({ date: data.day, toISOLocale: true })
     /** Searches for the date in the array that matches the selected date. */
-    const newWeekData = weekData.days.find(
-        (entry: DayTypes) => entry.date === dayToInsert,
-    )
+    const newWeekData = weekDayMatch(weekData, dayToInsert)
+
+    if (!newWeekData) return
 
     /** If the updated data object contains the trainingLocation update this too */
     if (data.trainingLocation) {
@@ -152,8 +181,6 @@ export function storesNewWeekData(data: DataProps) {
         weekData.days.map((entry: DayTypes) => {
             const currentDay = toTime(entry.date)
 
-            console.log(start, entry.date, currentDay, end, data.absence?.end)
-
             if (start <= currentDay && currentDay <= end) {
                 /** Sets the reason for the absence */
                 entry.absence = data.absence?.reason
@@ -166,7 +193,6 @@ export function storesNewWeekData(data: DataProps) {
         newWeekData.entries.push(data.value)
     }
 
-    console.log(weekData)
     upsertWeek(proofNumber, weekData)
 
     return true

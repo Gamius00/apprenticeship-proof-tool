@@ -3,11 +3,19 @@ import { useEffect, useState } from "react"
 import { FiPlusCircle } from "react-icons/fi"
 import { DATE_FORMATS, formatDate } from "@/shared-utils/date.ts"
 import { api } from "@/shared-utils/api-path.ts"
-import { IoMdClose } from "react-icons/io"
+import { IoIosCloseCircleOutline, IoMdClose } from "react-icons/io"
 import { cn } from "@/frontend/components/lib/utils.ts"
-import { DayTypes } from "@/shared-utils/types"
+import { DayTypes, WeekObject } from "@/shared-utils/types"
 
-export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
+export const Day = ({
+    day,
+    isHoliday,
+    weekObject,
+}: {
+    day: Date
+    isHoliday: boolean
+    weekObject: WeekObject | null
+}) => {
     /** The data for the selected day */
     const [data, setData] = useState<DayTypes | undefined>()
 
@@ -37,7 +45,7 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
         if (isNewEntryDialogOpen) return
 
         api.post("/api/getEntry", { date: day }).then(r => setData(r.data))
-    }, [day, isNewEntryDialogOpen])
+    }, [day, isNewEntryDialogOpen, weekObject?.absence])
 
     if (!data) return
 
@@ -55,6 +63,13 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
         api.post("/api/deleteEntry", { index, day })
     }
 
+    /** This function removes an absence from a day (e.g. Sick, Vacation)
+     * for example, the user created an absence for a wrong day*/
+    const removeAbsence = () => {
+        setData(prev => (prev ? { ...prev, absence: undefined } : undefined))
+        api.post("/api/removeAbsence", { day })
+    }
+
     return (
         <div
             className={cn(
@@ -63,21 +78,21 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
             )}
         >
             <div className="flex w-full justify-around items-center">
-                <div
-                    className={cn(
-                        "flex flex-col ml-20 items-center",
-                        (isHoliday || data.absence) && "ml-0",
-                    )}
-                >
+                <div className={"flex flex-col ml-20 items-center"}>
                     <p className="font-medium">{weekday}</p>
                     <p>{formatDate({ date: currentDay, region: "de-DE" })}</p>
                 </div>
-                {!(isHoliday || data.absence) && (
+                {!(isHoliday || data.absence) ? (
                     <FiPlusCircle
                         onClick={() => {
                             setIsNewEntryDialogOpen(true)
                         }}
                         className="w-6 h-6"
+                    />
+                ) : (
+                    <IoIosCloseCircleOutline
+                        className="w-7 h-7"
+                        onClick={removeAbsence}
                     />
                 )}
             </div>
@@ -101,7 +116,12 @@ export const Day = ({ day, isHoliday }: { day: Date; isHoliday: boolean }) => {
                 </div>
             )}
 
-            <div className="w-full flex flex-col items-center">
+            <div
+                className={cn(
+                    "w-full flex flex-col items-center",
+                    (data.absence || data.isHoliday) && "hidden",
+                )}
+            >
                 {!data
                     ? "Loading"
                     : data.entries?.map((entry: string, index: number) => (
