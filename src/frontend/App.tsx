@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '@/frontend/components/lib/api-path.ts'
+import { api } from '@/shared-utils/api-path.ts'
 
 export default function App() {
     const navigate = useNavigate()
@@ -13,7 +13,7 @@ export default function App() {
                 navigate('/signup')
             }
         })
-    })
+    }, [])
 
     return <></>
 }
