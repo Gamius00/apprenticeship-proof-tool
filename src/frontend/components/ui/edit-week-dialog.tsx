@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Dialog,
     DialogContent,
@@ -34,7 +32,8 @@ interface NewEntryDialogProps {
 /**
  * @param isOpen - Manage the state of the dialog (close, open)
  * @param setIsOpen - To change the state of the variable
- * @param weekObject
+ * @param weekObject - The data which the user wants to update
+ * @param setWeekObject - The variable to change the state of the weekObject
  */
 
 export const EditWeekDialog = ({

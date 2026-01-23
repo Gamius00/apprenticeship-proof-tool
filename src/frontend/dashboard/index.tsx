@@ -78,7 +78,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="bg-background w-screen h-screen flex flex-col gap-40 text-text pt-3">
+        <div className="bg-background min-h-screen overflow-hidden flex flex-col gap-40 text-text pt-3">
             <div className="flex justify-around">
                 <div className="flex gap-10">
                     <div
