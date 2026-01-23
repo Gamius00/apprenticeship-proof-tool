@@ -73,7 +73,7 @@ export const Day = ({
     return (
         <div
             className={cn(
-                "p-1 z-50 rounded-t-2xl pt-5 h-full w-72 bg-primary",
+                "p-1 z-50 rounded-2xl lg:rounded-t-2xl pt-5 h-full lg:h-[400px] lg:w-72 bg-primary",
                 (isHoliday || data.absence) && "bg-secondary",
             )}
         >

@@ -1,12 +1,12 @@
-import './index.css'
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import App from './App.tsx'
-import Dashboard from './dashboard'
-import Signup from './signup'
+import "./index.css"
+import React from "react"
+import ReactDOM from "react-dom/client"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import App from "./App.tsx"
+import Dashboard from "./dashboard"
+import Signup from "./signup"
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <Router>
             <Routes>

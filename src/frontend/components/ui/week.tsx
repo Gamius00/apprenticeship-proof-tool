@@ -40,7 +40,7 @@ export const WeekView = ({ difference, setWeekObject, weekObject }: WeekViewProp
 
     return (
         <>
-            <div className="flex h-screen gap-4 justify-around w-screen overflow-hidden">
+            <div className="flex flex-wrap h-full gap-4 justify-around">
                 {week.map((day, index) => {
                     const isoDay = formatDate({ date: day, toISOLocale: true })
 
