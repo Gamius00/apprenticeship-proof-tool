@@ -56,6 +56,7 @@ const insertData = ({ date, trainingLocation }: insertDataProps): InsertDataRetu
         days: weekData.map(date => {
             return {
                 date: formatDate({ date: date, toISOLocale: true }) ?? "",
+                workingHours: 8,
                 entries: [],
             }
         }),
@@ -119,7 +120,7 @@ export const resolveWeekData = ({ date }: { date: Date }) => {
 }
 
 /** Inserts or update data for the selected week
- * @param proofNumber - The number of the week since the beginning og the apprenticeship
+ * @param proofNumber - The number of the week since the beginning of the apprenticeship
  * @param data - The data which the user wants to update
  */
 const upsertWeek = (proofNumber: number, data?: InsertDataReturn) => {
@@ -136,6 +137,7 @@ const weekDayMatch = (weekData: InsertDataReturn, day: string | undefined) => {
 /** This func creates a new entry for a selected day
  * @param data.day - The day you want to store an entry for
  * @param data.value - The text you want to store
+ * @param data.workingHours - The workingHours of the current day
  * @param data.trainingsLocation - The trainingsLocation for the selected week */
 
 export function storesNewWeekData(data: DataProps) {
@@ -147,7 +149,7 @@ export function storesNewWeekData(data: DataProps) {
         upsertWeek(proofNumber, insertData({ date: data.day }))
     }
 
-    /** Stores the data of the displayed week */
+    /** Gets the already existing data of the current week */
     const weekData = getWeekData(proofNumber)
 
     /** The day to insert the data which the user wants to storage */
@@ -165,6 +167,8 @@ export function storesNewWeekData(data: DataProps) {
     /** If the selected day is a holiday in saxony set isHoliday = true */
     if (data.isHoliday) {
         newWeekData.isHoliday = true
+        /** Sets the working hour to 0 */
+        newWeekData.workingHours = 0
     }
 
     if (data.absence) {
@@ -184,6 +188,9 @@ export function storesNewWeekData(data: DataProps) {
             if (start <= currentDay && currentDay <= end) {
                 /** Sets the reason for the absence */
                 entry.absence = data.absence?.reason
+
+                /** Sets the working hour to 0 */
+                entry.workingHours = 0
             }
         })
     }

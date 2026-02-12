@@ -2,6 +2,7 @@ export interface DayTypes {
     date: string
     entries: string[]
     absence?: string
+    workingHours?: number
     isHoliday?: boolean
 }
 
